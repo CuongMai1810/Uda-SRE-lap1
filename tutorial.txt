@@ -1,0 +1,24 @@
+aws ec2 create-restore-image-task --object-key ami-08dff635fabae32e7.bin --bucket udacity-srend --name sre-lap1-ami-image
+
+aws ec2 copy-image --source-image-id <your-ami-id-from-above> --source-region us-east-1 --region us-east-2 --name udacity-cuongmh
+
+aws eks --region us-east-2  update-kubeconfig --name udacity-cluster
+
+kubectl create secret generic additional-scrape-configs --from-file=prometheus-additional.yaml --namespace monitoring
+kubectl delete secret additional-scrape-configs
+
+note: lấy value file mới ở kube-prometheus-stack git page 
+
+
+helm uninstall prometheus -n monitoring
+helm install prometheus prometheus-community/kube-prometheus-stack -f values.yaml --namespace monitoring --timeout 15m --debug
+helm upgrade --install prometheus prometheus-community/kube-prometheus-stack -f values.yaml --namespace monitoring --timeout 15m --debug
+
+helm install prometheus prometheus-community/kube-prometheus-stack -f "values.yaml" --namespace monitoring --version 18.0.8 --timeout 15m --debug
+helm install prometheus-blackbox-exporter prometheus-community/prometheus-blackbox-exporter -f blackbox-exporter.yaml --namespace monitoring
+
+helm list -n monitoring
+kubectl get all -n monitoring
+kubectl describe pod -n monitoring prometheus1-kube-prometheu-admission-create-fp6fq
+
+kubectl apply -f  -n monitoring
